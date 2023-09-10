@@ -17,7 +17,7 @@
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
-
+#include <queue>
 #include "common/config.h"
 #include "common/macros.h"
 
@@ -70,6 +70,8 @@ class LRUKReplacer {
    * @param[out] frame_id id of frame that is evicted.
    * @return true if a frame is evicted successfully, false if no frames can be evicted.
    */
+
+  auto CompareFrame(frame_id_t f1, frame_id_t f2) -> bool;
   auto Evict(frame_id_t *frame_id) -> bool;
 
   /**
@@ -135,11 +137,17 @@ class LRUKReplacer {
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
   // Remove maybe_unused if you start using them.
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+  size_t current_timestamp_{0};
+  size_t curr_size_{0};
+  size_t replacer_size_;
+  size_t k_;
   std::mutex latch_;
+
+  struct Frameinfo{
+    bool evictable_{false};
+    std::queue<size_t> time_;
+  };
+  std::unordered_map<frame_id_t, Frameinfo> hash_;
 };
 
 }  // namespace bustub
